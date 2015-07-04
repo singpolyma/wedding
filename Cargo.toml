@@ -6,6 +6,7 @@ authors = ["Stephen Paul Weber <singpolyma@singpolyma.net>"]
 [dependencies]
 iron = "*"
 router = "*"
+urlencoded = "*"
 
 [dependencies.logger]
 git = "https://github.com/iron/logger.git"
