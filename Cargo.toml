@@ -7,6 +7,7 @@ authors = ["Stephen Paul Weber <singpolyma@singpolyma.net>"]
 iron = "*"
 router = "*"
 urlencoded = "*"
+rust-sqlite = "*"
 
 [dependencies.logger]
 git = "https://github.com/iron/logger.git"

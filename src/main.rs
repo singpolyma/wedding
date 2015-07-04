@@ -2,22 +2,33 @@ extern crate iron;
 extern crate logger;
 extern crate router;
 extern crate urlencoded;
+extern crate sqlite3;
 
 use iron::prelude::*;
 use iron::status;
 use logger::Logger;
 use router::Router;
 use urlencoded::UrlEncodedBody;
+use sqlite3::{Query, ResultRowAccess};
 
 fn main() {
+
 	fn rsvp(req: &mut Request) -> IronResult<Response> {
+		let db = sqlite3::access::open("db.sqlite3", None).unwrap();
+
 		Ok(Response::with(
 			req.get_ref::<UrlEncodedBody>().ok().
-				and_then({ |x| x.get("q") }).
-				and_then({ |x| x.first() }).
+				and_then( |x| x.get("q") ).
+				and_then( |x| x.first() ).
 				map_or(
 					(status::BadRequest, "Invalid POST body.\n".to_string()),
-					{ |q| (status::Ok, format!("{}\n", q)) }
+					|q| {
+						db.prepare("SELECT * FROM guests WHERE fn LIKE $1").unwrap().
+							query(&[&format!("%{}%", q)], &mut |row|
+								Ok(println!("\nThing: {:?}\n", row.get::<&str,String>("fn")))
+							).unwrap();
+						(status::Ok, format!("{}\n", q))
+					}
 				)
 		))
 	}
