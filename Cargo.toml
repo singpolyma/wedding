@@ -1,0 +1,11 @@
+[package]
+name = "wedding"
+version = "0.1.0"
+authors = ["Stephen Paul Weber <singpolyma@singpolyma.net>"]
+
+[dependencies]
+iron = "*"
+router = "*"
+
+[dependencies.logger]
+git = "https://github.com/iron/logger.git"
