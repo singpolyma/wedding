@@ -3,6 +3,7 @@ extern crate logger;
 extern crate router;
 extern crate urlencoded;
 extern crate sqlite3;
+extern crate rustache;
 
 use iron::prelude::*;
 use iron::status;
@@ -23,10 +24,14 @@ fn main() {
 				map_or(
 					(status::BadRequest, "Invalid POST body.\n".to_string()),
 					|q| {
-						db.prepare("SELECT * FROM guests WHERE fn LIKE $1").unwrap().
-							query(&[&format!("%{}%", q)], &mut |row|
-								Ok(println!("\nThing: {:?}\n", row.get::<&str,String>("fn")))
-							).unwrap();
+						Vec::new().insert_vector("guests", |guests|
+							db.prepare("SELECT * FROM guests WHERE fn LIKE $1").unwrap().
+								query(&[&format!("%{}%", q)], &mut |row|
+									guests.push_hash( |guest|
+										guest.insert_string("fn", row.get("fn"))
+									)
+								).unwrap();
+						);
 						(status::Ok, format!("{}\n", q))
 					}
 				)

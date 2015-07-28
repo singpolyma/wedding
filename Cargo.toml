@@ -11,3 +11,6 @@ rust-sqlite = "*"
 
 [dependencies.logger]
 git = "https://github.com/iron/logger.git"
+
+[dependencies.rustache]
+git = "https://github.com/rustache/rustache"
