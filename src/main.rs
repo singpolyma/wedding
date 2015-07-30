@@ -36,7 +36,7 @@ fn main() {
 					|q|
 						(status::Ok, rustache::render_file("views/rsvp_results.mustache", HashBuilder::new().insert_vector("guests", |guests| {
 							let mut guests_box = Some(guests);
-							db.prepare("SELECT * FROM guests WHERE fn LIKE $1").unwrap().
+							db.prepare("SELECT * FROM guests WHERE fn LIKE $1 OR email LIKE $1").unwrap().
 								query(&[&format!("%{}%", q)], &mut |row| {
 									let name = row.get::<&str, String>("fn");
 									option_map_mut(&mut guests_box, |vec|
