@@ -3,16 +3,28 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>Stephen &amp; Lisette Getting Married!</title>
+		<link rel="stylesheet" type="text/css" href="/styles.css" media="screen" />
 	</head>
 	<body>
-		<h1>RSVP</h1>
+		<h1>Which of these is you?</h1>
 
 		<ul>
 		{{#guests}}
 			<li>
-				{{fn}}
+				<a href="/rsvp/{{id}}">{{fn}}</a>
 			</li>
 		{{/guests}}
 		</ul>
+
+		<section>
+			<h1>None of these are you? Search again</h1>
+
+			<form method="get" action="">
+				<label>By name or email: <input type="text" name="q" /></label>
+				<button>RSVP</button>
+			</form>
+
+			<p>If you still can't find yourself, email us at <a href="mailto:wedding@singpolyma.net">wedding@sette.ca</a></p>
+		<section>
 	</body>
 </html>

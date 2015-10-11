@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml" >
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Stephen &amp; Lisette Getting Married!</title>
+		<link rel="stylesheet" type="text/css" href="/styles.css" media="screen" />
+
+		<style type="text/css" media="screen">
+			input[name=vegetarian] {
+				width: 2.5em;
+				padding-left: 0.25em;
+			}
+		</style>
+
+		<script type="text/javascript">
+			function fieldVisibility(visibility) {
+				Array.prototype.forEach.call(document.querySelectorAll("[name=vegetarian], [name=songs], [name=carpool]"), function(el) {
+					var parent = el.parentElement;
+					if(parent.parentElement.tagName == "FIELDSET") {
+						parent = parent.parentElement;
+					}
+					parent.style.display = visibility;
+				});
+			}
+
+			window.addEventListener("load", function() {
+				Array.prototype.forEach.call(document.querySelectorAll("[name=coming]"), function(el) {
+					el.addEventListener("change", function() {
+						fieldVisibility(document.querySelector("form").coming.value == "coming" ? "block" : "none");
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>RSVP for {{fn}}</h1>
+
+		<form method="post" action="">
+			<fieldset>
+				<label><input type="radio" name="coming" value="coming" /> Coming</label>
+				<label><input type="radio" name="coming" value="not_coming" /> Not Coming</label>
+			</fieldset>
+
+			<label>We will have beef and chicken available. Enter the number of your party who cannot or will not eat those here for the vegetarian option: <input type="number" name="vegetarian" min="0" max="5" value="0" /></label>
+
+			<fieldset>
+				<label><input type="radio" name="carpool" value="need_ride" /> I need a ride to the church from town</label>
+				<label><input type="radio" name="carpool" value="need_ride" /> I can provide ride(s) to the church from town</label>
+				<label><input type="radio" name="carpool" value="need_ride" /> I will get myself to the church</label>
+			</fieldset>
+
+			<label>
+				Please suggest songs you would like to hear at our reception
+				<textarea name="songs" rows="6" cols="40"></textarea>
+			</label>
+
+			<label>
+				Any notes for us?
+				<textarea name="note" rows="6" cols="40"></textarea>
+			</label>
+
+			<button>Send RSVP</button>
+		</form>
+	</body>
+</html>
