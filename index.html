@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml" >
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Stephen &amp; Lisette Getting Married!</title>
+
+		<link rel="stylesheet" type="text/css" href="/styles.css" media="screen" />
+		<style type="text/css" media="screen">
+			body { padding-right: 30%; }
+
+			.contact {
+				position: fixed;
+				top: 0;
+				right: 0;
+				height: 100vh;
+				width: 30%;
+				padding: 1em;
+				padding-left: 5%;
+			}
+			.contact > img {
+				max-width: 100%;
+			}
+			.contact > a { display: block; }
+
+			.location > span, .geo > span { display: inline-block; }
+
+			#registry form { display: inline-block; }
+
+			#rsvp label, #rsvp button { display: inline; }
+		</style>
+	</head>
+	<body>
+		<div class="vevent">
+			<div class="contact">
+				<img class="photo" src="stephenAndLisette.jpg" alt="...and so happy about it!" />
+				<a href="mailto:wedding@sette.ca">wedding@sette.ca</a>
+				<a href="mailto:wedding@singpolyma.net">wedding@singpolyma.net</a>
+			</div>
+
+			<h1 class="summary"><a class="url" href="/">Getting Married!</a></h1>
+
+			<time class="dtstart" datetime="2016-04-16" title="2016-107">April 16th, 2016</time>
+
+			<section>
+				<h1>Ceremony</h1>
+				<span class="location">Rosebank Brethren in Christ Church <span>(1434 Huron Rd, Wilmot, Ontario)</span></span>
+				<a class="geo" href="http://osm.org/go/ZXnO19vVd--?m="><span class="latitude">43.3736783</span>, <span class="longitude">-80.5416386</span></a>
+			</section>
+
+			<section>
+				<h1>Reception</h1>
+				<span class="location">The Victoria Park Pavilion <span>(80 Schneider Ave, Kitchener, Ontario)</span></span>
+				<a class="geo" href="http://osm.org/go/ZXnwRoNiw--?m="><span class="latitude">43.4456983</span>, <span class="longitude">-80.4991108</span></a>
+			</section>
+
+			<section id="rsvp">
+				<h1>RSVP</h1>
+				<form method="get" action="/rsvp">
+					<label>By name or email: <input type="text" name="q" /></label>
+					<button>RSVP</button>
+				</form>
+			</section>
+
+			<section id="registry">
+				<h1>Registry - Coming Soon!</h1>
+
+				<ul>
+					<!-- <li>Set of bath sheets <form method="post" action="/registry"><button>Got it!</button></form></li> -->
+				</ul>
+			</section>
+		</div>
+	</body>
+</html>
