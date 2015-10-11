@@ -45,8 +45,9 @@ fn main() {
 			req.get_ref::<UrlEncodedQuery>().ok().
 				and_then( |x| x.get("q") ).
 				and_then( |x| x.first() ).
+				and_then( |x| if(x.len() > 3) { Some(x) } else { None } ).
 				map_or(
-					(iron::modifiers::Header(iron::headers::ContentType::plaintext()), status::BadRequest, "Invalid POST body.\n".to_string().into_bytes()),
+					(iron::modifiers::Header(iron::headers::ContentType::plaintext()), status::BadRequest, "Search no good, go back and try again.".to_string().into_bytes()),
 					|q|
 						(iron::modifiers::Header(iron::headers::ContentType::html()), status::Ok, rustache::render_file("views/rsvp_results.mustache", HashBuilder::new().insert_vector("guests", |guests| {
 							query_fold(
