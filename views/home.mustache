@@ -18,6 +18,10 @@
 				width: 30%;
 			}
 
+			.notice {
+				font-weight: bold;
+			}
+
 			.contact {
 				position: fixed;
 				top: 0;
@@ -100,6 +104,7 @@
 
 			<section id="registry">
 				<h1>Registry</h1>
+				{{#message}}<p class="notice">{{message}}</p>{{/message}}
 
 				<ul>
 				{{#registry}}
@@ -107,13 +112,11 @@
 						{{#photo}}<img class="photo" src="{{photo}}" alt="Product photo" />{{/photo}}
 						<h1>{{title}}</h1>
 						{{#note}}<p>{{note}}</p>{{/note}}
-						{{url}}
-							{{#exactly}}You can <a class="url" href="{{url}}">buy it here</a>.{{/exactly}}
-							{{^exactly}}Something like <a class="url" href="{{url}}">this one here</a>.{{/exactly}}
-						{{/url}}
-						<div>Remaining to get: {{want}}</div>
+						{{#exactly}}{{#url}}You can <a class="url" href="{{url}}">buy it here</a>.{{/url}}{{/exactly}}
+						{{^exactly}}{{#url}}Something like <a class="url" href="{{url}}">this one here</a>.{{/url}}{{/exactly}}
+						<div>Remaining to get: {{need}}</div>
 
-						<form method="post" action="/">
+						<form method="post" action="/#registry">
 							<button name="id" value="{{id}}">I bought one!</button>
 						</form>
 					</li>

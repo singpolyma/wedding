@@ -12,7 +12,7 @@ use router::Router;
 use urlencoded::{UrlEncodedBody, UrlEncodedQuery};
 use sqlite3::{Query, ResultRowAccess, StatementUpdate};
 use sqlite3::types::{ToSql};
-use sqlite3::core::{ResultRow, PreparedStatement};
+use sqlite3::core::{ResultRow, PreparedStatement, DatabaseConnection};
 use rustache::HashBuilder;
 
 fn option_map_mut<T, F: FnOnce(T) -> T>(x: &mut Option<T>, f: F) {
@@ -36,45 +36,68 @@ fn query_fold<T, F: Fn(&mut ResultRow, T) -> T>(z: T, q: &mut PreparedStatement,
 	zbox.unwrap()
 }
 
+fn render_home(db: DatabaseConnection, msg: Option<&str>) -> IronResult<Response> {
+	Ok(Response::with(
+		(
+			iron::modifiers::Header(iron::headers::ContentType::html()),
+			status::Ok,
+			rustache::render_file("views/home.mustache",
+				HashBuilder::new().
+				insert_string("message", msg.unwrap_or("")).
+				insert_vector("registry", |registry| {
+					query_fold(
+						registry,
+						&mut db.prepare("SELECT *, want - bought AS need FROM registry WHERE (want - bought) > 0").unwrap(),
+						&[],
+						|row, vec| {
+							let id = row.get::<&str, i32>("id");
+							let title = row.get::<&str, String>("title");
+							let url = row.get::<&str, String>("url");
+							let note = row.get::<&str, String>("note");
+							let photo = row.get::<&str, String>("photo");
+							let need = row.get::<&str, i32>("need");
+							let exactly = row.get::<&str, bool>("exactly");
+							vec.push_hash( |hsh| {
+								hsh.
+									insert_int("id", id).
+									insert_string("title", title.clone()).
+									insert_string("url", url.clone()).
+									insert_string("note", note.clone()).
+									insert_string("photo", photo.clone()).
+									insert_int("need", need).
+									insert_bool("exactly", exactly)
+							})
+						}
+					)
+				})
+			).unwrap().unwrap()
+		)
+	))
+}
+
 fn main() {
 
 	fn home(req: &mut Request) -> IronResult<Response> {
 		let db = sqlite3::access::open("db.sqlite3", None).unwrap();
+		return render_home(db, None);
+	}
 
-		Ok(Response::with(
-			(
-				iron::modifiers::Header(iron::headers::ContentType::html()),
-				status::Ok,
-				rustache::render_file("views/home.mustache",
-					HashBuilder::new().insert_vector("registry", |registry| {
-						query_fold(
-							registry,
-							&mut db.prepare("SELECT * FROM registry WHERE want > 0").unwrap(),
-							&[],
-							|row, vec| {
-								let id = row.get::<&str, i32>("id");
-								let title = row.get::<&str, String>("title");
-								let url = row.get::<&str, String>("url");
-								let note = row.get::<&str, String>("note");
-								let photo = row.get::<&str, String>("photo");
-								let want = row.get::<&str, i32>("want");
-								let exactly = row.get::<&str, bool>("exactly");
-								vec.push_hash( |hsh| {
-									hsh.
-										insert_int("id", id).
-										insert_string("title", title.clone()).
-										insert_string("url", url.clone()).
-										insert_string("note", note.clone()).
-										insert_string("photo", photo.clone()).
-										insert_int("want", want).
-										insert_bool("exactly", exactly)
-								})
-							}
-						)
-					})
-				).unwrap().unwrap()
-			)
-		))
+	fn registry_post(req: &mut Request) -> IronResult<Response> {
+		let db = sqlite3::access::open("db.sqlite3", None).unwrap();
+
+		let body = req.get_ref::<UrlEncodedBody>().ok();
+
+		match body.and_then( |x| x.get("id") ).and_then( |x| x.first() ) {
+			Some(id) => {
+				db.prepare("UPDATE registry SET bought=bought+1 WHERE id=?1").unwrap().
+					update(&[id]).
+					unwrap();
+
+				render_home(db, Some("Your purchase has been recorded in our registry.  Thanks!"))
+			}
+			None =>
+				Ok(Response::with((status::BadRequest, "Bad request.")))
+		}
 	}
 
 	fn rsvp_search(req: &mut Request) -> IronResult<Response> {
@@ -156,6 +179,7 @@ fn main() {
 
 	let mut router = Router::new();
 	router.get("/", home);
+	router.post("/", registry_post);
 	router.get("/rsvp", rsvp_search);
 	router.get("/rsvp/:guestid", rsvp_form);
 	router.post("/rsvp/:guestid", rsvp);
