@@ -37,7 +37,34 @@
 			#registry form { display: inline-block; }
 
 			#rsvp label, #rsvp button { display: inline; }
+
+			.product {
+				list-style-type: none;
+				clear: left;
+			}
+			.product > .photo {
+				float: left;
+				margin-right: 0.5em;
+			}
+			.product > h1 {
+				font-size: 1.1em;
+			}
+			.product > form {
+				margin-top: 0.5em;
+			}
 		</style>
+
+		<script type="text/javascript">
+			window.addEventListener("load", function() {
+				Array.prototype.forEach.call(document.querySelectorAll(".product > form"), function(el) {
+					el.addEventListener("submit", function(e) {
+						if(!confirm("Really mark off that you purchased this item?")) {
+							e.preventDefault();
+						}
+					});
+				});
+			});
+		</script>
 	</head>
 	<body>
 		<div class="vevent">
@@ -72,10 +99,25 @@
 			</section>
 
 			<section id="registry">
-				<h1>Registry - Coming Soon!</h1>
+				<h1>Registry</h1>
 
 				<ul>
-					<!-- <li>Set of bath sheets <form method="post" action="/registry"><button>Got it!</button></form></li> -->
+				{{#registry}}
+					<li class="product">
+						{{#photo}}<img class="photo" src="{{photo}}" alt="Product photo" />{{/photo}}
+						<h1>{{title}}</h1>
+						{{#note}}<p>{{note}}</p>{{/note}}
+						{{url}}
+							{{#exactly}}You can <a class="url" href="{{url}}">buy it here</a>.{{/exactly}}
+							{{^exactly}}Something like <a class="url" href="{{url}}">this one here</a>.{{/exactly}}
+						{{/url}}
+						<div>Remaining to get: {{want}}</div>
+
+						<form method="post" action="/">
+							<button name="id" value="{{id}}">I bought one!</button>
+						</form>
+					</li>
+				{{/registry}}
 				</ul>
 			</section>
 

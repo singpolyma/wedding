@@ -38,6 +38,45 @@ fn query_fold<T, F: Fn(&mut ResultRow, T) -> T>(z: T, q: &mut PreparedStatement,
 
 fn main() {
 
+	fn home(req: &mut Request) -> IronResult<Response> {
+		let db = sqlite3::access::open("db.sqlite3", None).unwrap();
+
+		Ok(Response::with(
+			(
+				iron::modifiers::Header(iron::headers::ContentType::html()),
+				status::Ok,
+				rustache::render_file("views/home.mustache",
+					HashBuilder::new().insert_vector("registry", |registry| {
+						query_fold(
+							registry,
+							&mut db.prepare("SELECT * FROM registry WHERE want > 0").unwrap(),
+							&[],
+							|row, vec| {
+								let id = row.get::<&str, i32>("id");
+								let title = row.get::<&str, String>("title");
+								let url = row.get::<&str, String>("url");
+								let note = row.get::<&str, String>("note");
+								let photo = row.get::<&str, String>("photo");
+								let want = row.get::<&str, i32>("want");
+								let exactly = row.get::<&str, bool>("exactly");
+								vec.push_hash( |hsh| {
+									hsh.
+										insert_int("id", id).
+										insert_string("title", title.clone()).
+										insert_string("url", url.clone()).
+										insert_string("note", note.clone()).
+										insert_string("photo", photo.clone()).
+										insert_int("want", want).
+										insert_bool("exactly", exactly)
+								})
+							}
+						)
+					})
+				).unwrap().unwrap()
+			)
+		))
+	}
+
 	fn rsvp_search(req: &mut Request) -> IronResult<Response> {
 		let db = sqlite3::access::open("db.sqlite3", None).unwrap();
 
@@ -116,6 +155,7 @@ fn main() {
 	}
 
 	let mut router = Router::new();
+	router.get("/", home);
 	router.get("/rsvp", rsvp_search);
 	router.get("/rsvp/:guestid", rsvp_form);
 	router.post("/rsvp/:guestid", rsvp);
